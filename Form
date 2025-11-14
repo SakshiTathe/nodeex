@@ -41,3 +41,67 @@ function MyForm() {
 }
 
 export default MyForm;
+
+
+const express = require("express");
+const app = express();
+const User = require("./User");
+require("./db"); // connect db
+
+app.use(express.json());
+
+// API to save data
+app.post("/user", async (req, res) => {
+  try {
+    const { username, role } = req.body;
+
+    const newUser = new User({ username, role });
+
+    const savedUser = await newUser.save();
+
+    res.json({
+      message: "User saved successfully",
+      data: savedUser,
+    });
+  } catch (error) {
+    res.status(500).json({ error: "Error saving user" });
+  }
+});
+
+app.listen(5000, () => console.log("Server running on 5000"));
+app.get("/users", async (req, res) => {
+  try {
+    const users = await User.find(); // get all users
+    res.json(users);
+  } catch (error) {
+    res.status(500).json({ error: "Error fetching users" });
+  }
+});
+import { useEffect, useState } from "react";
+
+function UserList() {
+  const [users, setUsers] = useState([]);
+
+  useEffect(() => {
+    fetch("http://localhost:5000/users")
+      .then((res) => res.json())
+      .then((data) => setUsers(data))
+      .catch((err) => console.log(err));
+  }, []);
+
+  return (
+    <div>
+      <h2>All Users</h2>
+
+      {users.map((user) => (
+        <div key={user._id}>
+          <p>Username: {user.username}</p>
+          <p>Role: {user.role}</p>
+          <hr />
+        </div>
+      ))}
+    </div>
+  );
+}
+
+export default UserList;
