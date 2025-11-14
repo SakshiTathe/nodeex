@@ -1,0 +1,23 @@
+import { useEffect, useState } from 'react';
+import './App.css';
+
+function App() {
+  const [message, setMessage] = useState("");
+
+  useEffect(() => {
+    // fetch data from backend
+    fetch("http://localhost:5000/api/message")
+      .then(res => res.json())
+      .then(data => setMessage(data.message))
+      .catch(err => console.log("Error fetching:", err));
+  }, []);
+
+  return (
+    <div style={{ textAlign: "center", marginTop: "50px" }}>
+      <h1>Vite + React + Node Integration</h1>
+      <h2>{message ? message : "Loading message from backend..."}</h2>
+    </div>
+  );
+}
+
+export default App;
